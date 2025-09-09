@@ -1,0 +1,14 @@
+﻿2025-09-09T11:11:08.4890220Z [INFO] Start import: data/CSV_Valid_4rows.csv
+2025-09-09T11:11:08.5031470Z [INFO] Finish import: used=4; discarded=0; ms=11
+2025-09-09T11:11:13.5906030Z [INFO] Start import: data/CSV_BadNumber.csv
+2025-09-09T11:11:13.6018740Z [ERROR] Number format at line 2, field φi
+2025-09-09T11:11:13.6044920Z [INFO] Finish import: used=5; discarded=1; ms=13
+2025-09-09T11:11:19.7480690Z [INFO] Start import: data/CSV_MissingCols.csv
+2025-09-09T11:11:19.7531360Z [ERROR] Bad schema at line 1
+2025-09-09T11:11:19.7532690Z [ERROR] Bad schema at line 2
+2025-09-09T11:11:19.7533190Z [ERROR] Bad schema at line 3
+2025-09-09T11:11:19.7533610Z [ERROR] Bad schema at line 4
+2025-09-09T11:11:19.7533960Z [ERROR] Bad schema at line 5
+2025-09-09T11:11:19.7584840Z [INFO] Finish import: used=0; discarded=5; ms=7
+2025-09-09T11:11:23.2137040Z [INFO] Start import: data/CSV_ZeroSigmas.csv
+2025-09-09T11:11:23.2286420Z [INFO] Finish import: used=4; discarded=0; ms=16
