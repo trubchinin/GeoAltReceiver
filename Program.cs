@@ -51,6 +51,23 @@ namespace GeoAltReceiver
 		public double EpsHPct { get; init; }
 	}
 
+	// === Константні тексти помилок SR-F14 ===
+	public static class Errors
+	{
+		public const string ERR_BAD_CSV_SCHEMA =
+			"Очікується 8 колонок: ri,Δri,φi,Δφi,λi,Δλi,hi,Δhi.";
+		public const string ERR_NOT_ENOUGH_DATA =
+			"Недостатньо даних для визначення φ, λ, h (N<4).";
+		public const string ERR_VALUE_OUT_OF_RANGE =
+			"Значення поза допустимим діапазоном: <поле>.";
+		public const string ERR_NEGATIVE_OR_ZERO =
+			"Невід’ємні значення очікуються для <поле>.";
+		public const string ERR_NUMBER_FORMAT =
+			"Невірний числовий формат у полі <поле>.";
+		public const string ERR_NO_CONVERGENCE =
+			"Досягнуто ліміт ітерацій без збіжності (результат попередній).";
+	}
+
 	// === Простий логер із ротацією до 1 МБ (останні 3 файли) ===
 	public static class Logger
 	{
@@ -221,14 +238,6 @@ namespace GeoAltReceiver
 			return R;
 		}
 
-		public static double[,] Mul(double[,] M, double scalar)
-		{
-			var R = new double[3,3];
-			for (int i=0;i<3;i++)
-				for (int j=0;j<3;j++) R[i,j]=M[i,j]*scalar;
-			return R;
-		}
-
 		public static double[,] Transpose(double[,] M)
 		{
 			var R = new double[3,3];
@@ -253,7 +262,7 @@ namespace GeoAltReceiver
 
 			if (!File.Exists(path))
 			{
-				var msg = $"ERR_BAD_CSV_SCHEMA: \"Очікується 8 колонок: ri,Δri,φi,Δφi,λi,Δλi,hi,Δhi.\" Файл не знайдено: {path}";
+				var msg = $"ERR_BAD_CSV_SCHEMA: \"{Errors.ERR_BAD_CSV_SCHEMA}\" Файл не знайдено: {path}";
 				Logger.Error(msg);
 				throw new ApplicationException(msg);
 			}
@@ -291,7 +300,7 @@ namespace GeoAltReceiver
 						LineNo = lineNo,
 						Code = RejectionCode.MISSING_COLUMN,
 						Field = "schema",
-						Message = "ERR_BAD_CSV_SCHEMA: Очікується 8 колонок: ri,Δri,φi,Δφi,λi,Δλi,hi,Δhi."
+						Message = "ERR_BAD_CSV_SCHEMA: " + Errors.ERR_BAD_CSV_SCHEMA
 					});
 					Logger.Error($"Bad schema at line {lineNo}");
 					continue;
@@ -315,15 +324,15 @@ namespace GeoAltReceiver
 				{ RejectNumber(lineNo, "Δhi", rejected); continue; }
 
 				bool bad = false;
-				if (ri <= 0) { Reject(lineNo, RejectionCode.NEGATIVE_DISTANCE, "ri", "Невід’ємні значення очікуються для ri (>0).", rejected); bad = true; }
-				if (dri < 0) { Reject(lineNo, RejectionCode.NEGATIVE_SIGMA, "Δri", "Невід’ємні значення очікуються для Δri (≥0).", rejected); bad = true; }
+				if (ri <= 0) { Reject(lineNo, RejectionCode.NEGATIVE_DISTANCE, "ri", Errors.ERR_NEGATIVE_OR_ZERO.Replace("<поле>", "ri (>0)"), rejected); bad = true; }
+				if (dri < 0) { Reject(lineNo, RejectionCode.NEGATIVE_SIGMA, "Δri", Errors.ERR_NEGATIVE_OR_ZERO.Replace("<поле>", "Δri (≥0)"), rejected); bad = true; }
 
-				if (phi < -90 || phi > 90) { Reject(lineNo, RejectionCode.OUT_OF_RANGE_LAT, "φi", "Значення поза допустимим діапазоном [-90..90].", rejected); bad = true; }
-				if (lambda < -180 || lambda > 180) { Reject(lineNo, RejectionCode.OUT_OF_RANGE_LON, "λi", "Значення поза допустимим діапазоном [-180..180].", rejected); bad = true; }
+				if (phi < -90 || phi > 90) { Reject(lineNo, RejectionCode.OUT_OF_RANGE_LAT, "φi", Errors.ERR_VALUE_OUT_OF_RANGE.Replace("<поле>", "φi [-90..90]"), rejected); bad = true; }
+				if (lambda < -180 || lambda > 180) { Reject(lineNo, RejectionCode.OUT_OF_RANGE_LON, "λi", Errors.ERR_VALUE_OUT_OF_RANGE.Replace("<поле>", "λi [-180..180]"), rejected); bad = true; }
 
-				if (dphi < 0) { Reject(lineNo, RejectionCode.NEGATIVE_SIGMA, "Δφi", "Невід’ємні значення очікуються для Δφi (≥0).", rejected); bad = true; }
-				if (dlambda < 0) { Reject(lineNo, RejectionCode.NEGATIVE_SIGMA, "Δλi", "Невід’ємні значення очікуються для Δλi (≥0).", rejected); bad = true; }
-				if (dh < 0) { Reject(lineNo, RejectionCode.NEGATIVE_SIGMA, "Δhi", "Невід’ємні значення очікуються для Δhi (≥0).", rejected); bad = true; }
+				if (dphi < 0) { Reject(lineNo, RejectionCode.NEGATIVE_SIGMA, "Δφi", Errors.ERR_NEGATIVE_OR_ZERO.Replace("<поле>", "Δφi (≥0)"), rejected); bad = true; }
+				if (dlambda < 0) { Reject(lineNo, RejectionCode.NEGATIVE_SIGMA, "Δλi", Errors.ERR_NEGATIVE_OR_ZERO.Replace("<поле>", "Δλi (≥0)"), rejected); bad = true; }
+				if (dh < 0) { Reject(lineNo, RejectionCode.NEGATIVE_SIGMA, "Δhi", Errors.ERR_NEGATIVE_OR_ZERO.Replace("<поле>", "Δhi (≥0)"), rejected); bad = true; }
 
 				if (h < -500 || h > 50000)
 				{
@@ -367,7 +376,7 @@ namespace GeoAltReceiver
 				LineNo = lineNo,
 				Code = RejectionCode.BAD_NUMBER_FORMAT,
 				Field = field,
-				Message = $"ERR_NUMBER_FORMAT: Невірний числовий формат у полі {field}."
+				Message = $"ERR_NUMBER_FORMAT: {Errors.ERR_NUMBER_FORMAT.Replace("<поле>", field)}"
 			});
 			Logger.Error($"Number format at line {lineNo}, field {field}");
 		}
@@ -403,7 +412,7 @@ namespace GeoAltReceiver
 			return new EcefPoint(cx * scale, cy * scale, cz * scale);
 		}
 
-		public static (EcefPoint rEcef, int iters, bool converged, double[,] JTJ, double[] JTv, List<double[]> Jrows, List<double> gModel)
+		public static (EcefPoint rEcef, int iters, bool converged, double[,] JTJ, List<double[]> Jrows, List<double> gModel)
 			Solve(List<EcefPoint> sats, List<double> ranges, Options opt, bool verbose)
 		{
 			var r = InitialGuess(sats);
@@ -411,12 +420,14 @@ namespace GeoAltReceiver
 			var Jrows = new List<double[]>(n);
 			var gModel = new List<double>(n);
 
+			double[,] JTJ = new double[3, 3];
+
 			for (int k = 0; k < opt.MaxIters; k++)
 			{
+				Array.Clear(JTJ, 0, JTJ.Length);
 				Jrows.Clear();
 				gModel.Clear();
 
-				double[,] JTJ = new double[3, 3];
 				double[] JTv = new double[3];
 
 				for (int i = 0; i < n; i++)
@@ -451,7 +462,7 @@ namespace GeoAltReceiver
 				if (!LinAlg3.Solve3x3(JTJ, JTv, out var dr))
 				{
 					if (verbose) Console.WriteLine("[!] Ill-conditioned normal matrix; stopping.");
-					return (r, k, false, JTJ, JTv, Jrows, gModel);
+					return (r, k, false, JTJ, Jrows, gModel);
 				}
 
 				r = new EcefPoint(r.X + dr[0], r.Y + dr[1], r.Z + dr[2]);
@@ -461,36 +472,31 @@ namespace GeoAltReceiver
 
 				if (normDx <= opt.Tol)
 				{
-					return (r, k + 1, true, JTJ, JTv, Jrows, gModel);
+					return (r, k + 1, true, JTJ, Jrows, gModel);
 				}
 			}
 			// кінець по ліміту ітерацій
-			return (r, opt.MaxIters, false, new double[3,3], new double[3], Jrows, gModel);
+			return (r, opt.MaxIters, false, JTJ, Jrows, gModel);
 		}
 	}
 
 	// === Обчислення ефективних σ вимірювань, коваріації та ε… (%) ===
 	public static class Uncertainty
 	{
-		// Обчислити ефективну σ_ри з урахуванням Δri, Δφi, Δλi, Δhi через чутливості (чисельно)
 		public static double EffectiveSigmaMeters(
 			SatelliteObs obs,
 			EcefPoint receiverEcef,
 			bool verbose)
 		{
-			// Базова модельна відстань
 			var satBase = GeoTransform.GeoToEcef(new GeoPoint(obs.phiDeg, obs.lambdaDeg, obs.h));
 			double g0 = Dist(receiverEcef, satBase);
 
 			double sigma2 = obs.dr * obs.dr; // внесок Δri
 
-			// Чисельні похідні ∂g/∂φ, ∂g/∂λ, ∂g/∂h у точці базових значень
-			// Кроки для диференціювання:
-			double dPhiStepRad = 1e-6;         // ~0.000057°
+			double dPhiStepRad = 1e-6;
 			double dLamStepRad = 1e-6;
-			double dHStep = 1e-3;              // 1 мм
+			double dHStep = 1e-3;
 
-			// ∂g/∂φ
 			{
 				var satMinus = GeoTransform.GeoToEcef(new GeoPoint(obs.phiDeg - GeoTransform.Rad2Deg(dPhiStepRad), obs.lambdaDeg, obs.h));
 				var satPlus  = GeoTransform.GeoToEcef(new GeoPoint(obs.phiDeg + GeoTransform.Rad2Deg(dPhiStepRad), obs.lambdaDeg, obs.h));
@@ -498,7 +504,6 @@ namespace GeoAltReceiver
 				double dphiRad = Math.Abs(obs.dphiDeg) * Math.PI / 180.0;
 				sigma2 += (dg_dphi * dphiRad) * (dg_dphi * dphiRad);
 			}
-			// ∂g/∂λ
 			{
 				var satMinus = GeoTransform.GeoToEcef(new GeoPoint(obs.phiDeg, obs.lambdaDeg - GeoTransform.Rad2Deg(dLamStepRad), obs.h));
 				var satPlus  = GeoTransform.GeoToEcef(new GeoPoint(obs.phiDeg, obs.lambdaDeg + GeoTransform.Rad2Deg(dLamStepRad), obs.h));
@@ -506,16 +511,15 @@ namespace GeoAltReceiver
 				double dlamRad = Math.Abs(obs.dlambdaDeg) * Math.PI / 180.0;
 				sigma2 += (dg_dlam * dlamRad) * (dg_dlam * dlamRad);
 			}
-			// ∂g/∂h
 			{
 				var satMinus = GeoTransform.GeoToEcef(new GeoPoint(obs.phiDeg, obs.lambdaDeg, obs.h - dHStep));
 				var satPlus  = GeoTransform.GeoToEcef(new GeoPoint(obs.phiDeg, obs.lambdaDeg, obs.h + dHStep));
-				double dg_dh = (Dist(receiverEcef, satPlus) - Dist(receiverEcef, satMinus)) / (2.0 * dHStep); // м/м (безрозмірна)
+				double dg_dh = (Dist(receiverEcef, satPlus) - Dist(receiverEcef, satMinus)) / (2.0 * dHStep); // м/м
 				double dh = Math.Abs(obs.dh);
 				sigma2 += (dg_dh * dh) * (dg_dh * dh);
 			}
 
-			double sigma = Math.Sqrt(Math.Max(sigma2, 1e-18)); // захист від нуля/від’ємності
+			double sigma = Math.Sqrt(Math.Max(sigma2, 1e-18));
 			return sigma;
 		}
 
@@ -525,16 +529,14 @@ namespace GeoAltReceiver
 			return Math.Sqrt(dx*dx + dy*dy + dz*dz);
 		}
 
-		// Обчислити ков. матрицю приймача в ECEF: Cov_r ≈ (Jᵀ W J)^-1
-		// Jrows — рядки Якобіана ∂g/∂r, W — діагональ з 1/σ_i^2
 		public static bool CovarianceReceiverECEF(
 			List<double[]> Jrows,
 			List<double> sigmaEff,
-			out double[,] Cov_r)
+			out double[,] Cov_r,
+			out double condHeuristic)
 		{
 			Cov_r = new double[3,3];
 
-			// Обчислюємо JT W J
 			double[,] JT_W_J = new double[3,3];
 			for (int i = 0; i < Jrows.Count; i++)
 			{
@@ -545,7 +547,17 @@ namespace GeoAltReceiver
 						JT_W_J[r,c] += j[r] * wi * j[c];
 			}
 
-			// Невеличке регуляризаційне демпфування (на випадок поганої обумовленості)
+			// Грубий евристичний кондішн: trace^3 / det (для SPD 3x3)
+			double tr = JT_W_J[0,0] + JT_W_J[1,1] + JT_W_J[2,2];
+			double det =
+				JT_W_J[0,0]*(JT_W_J[1,1]*JT_W_J[2,2]-JT_W_J[1,2]*JT_W_J[2,1]) -
+				JT_W_J[0,1]*(JT_W_J[1,0]*JT_W_J[2,2]-JT_W_J[1,2]*JT_W_J[2,0]) +
+				JT_W_J[0,2]*(JT_W_J[1,0]*JT_W_J[2,1]-JT_W_J[1,1]*JT_W_J[2,0]);
+
+			if (det <= 1e-24) det = 1e-24; // захист від нуля
+			condHeuristic = (tr*tr*tr) / det; // чим більше — тим гірша обумовленість
+
+			// Невеличке регуляризаційне демпфування
 			for (int d = 0; d < 3; d++) JT_W_J[d,d] += 1e-9;
 
 			if (!LinAlg3.Invert3x3(JT_W_J, out Cov_r))
@@ -553,7 +565,6 @@ namespace GeoAltReceiver
 			return true;
 		}
 
-		// Якобіан переходу T = ∂(φ,λ,h)/∂(X,Y,Z) в точці оцінки — чисельно
 		public static double[,] JacobianGeoWrtECEF(EcefPoint r)
 		{
 			double d = 1e-3; // 1 мм
@@ -563,7 +574,6 @@ namespace GeoAltReceiver
 			var gY = GeoTransform.EcefToGeo(new EcefPoint(r.X, r.Y + d, r.Z));
 			var gZ = GeoTransform.EcefToGeo(new EcefPoint(r.X, r.Y, r.Z + d));
 
-			// одиниці: φ,λ у градусах; h у метрах
 			double dphi_dX = (gX.PhiDeg - g0.PhiDeg) / d;
 			double dphi_dY = (gY.PhiDeg - g0.PhiDeg) / d;
 			double dphi_dZ = (gZ.PhiDeg - g0.PhiDeg) / d;
@@ -583,7 +593,6 @@ namespace GeoAltReceiver
 			return T;
 		}
 
-		// Перенесення коваріації в простір (φ,λ,h): Cov_out = T * Cov_r * T^T
 		public static double[,] CovarianceOut(double[,] Cov_r, double[,] T)
 		{
 			var TCov = LinAlg3.Mul(T, Cov_r);
@@ -591,16 +600,13 @@ namespace GeoAltReceiver
 			return LinAlg3.Mul(TCov, TT);
 		}
 
-		// Відносні похибки у відсотках з округленням до 0.01%
 		public static (double epsPhiPct, double epsLamPct, double epsHPct) RelativeErrorsPct(
 			GeoPoint outGeo, double[,] Cov_out)
 		{
-			// σ — корені діагоналі Cov_out
 			double sigmaPhiDeg = Math.Sqrt(Math.Max(Cov_out[0,0], 0.0)); // градуси
 			double sigmaLamDeg = Math.Sqrt(Math.Max(Cov_out[1,1], 0.0)); // градуси
-			double sigmaHM = Math.Sqrt(Math.Max(Cov_out[2,2], 0.0));     // метри
+			double sigmaHM     = Math.Sqrt(Math.Max(Cov_out[2,2], 0.0)); // метри
 
-			// Захист від ділення на ~0 (повністю забороняємо NaN/Inf в звіті)
 			double denomPhi = Math.Max(Math.Abs(outGeo.PhiDeg), 1e-9);
 			double denomLam = Math.Max(Math.Abs(outGeo.LambdaDeg), 1e-9);
 			double denomH   = Math.Max(Math.Abs(outGeo.Hm), 1e-9);
@@ -609,11 +615,48 @@ namespace GeoAltReceiver
 			double epsLam = Math.Abs(sigmaLamDeg) / denomLam * 100.0;
 			double epsH   = Math.Abs(sigmaHM)    / denomH    * 100.0;
 
-			// Округлення до 0.01%
 			epsPhi = Math.Round(epsPhi, 2, MidpointRounding.AwayFromZero);
 			epsLam = Math.Round(epsLam, 2, MidpointRounding.AwayFromZero);
 			epsH   = Math.Round(epsH,   2, MidpointRounding.AwayFromZero);
 			return (epsPhi, epsLam, epsH);
+		}
+	}
+
+	// === Побудова протоколу SR-F13 ===
+	public static class ProtocolBuilder
+	{
+		public static string Build(
+			int used, int discarded, List<Rejection> rejected,
+			int iters, bool converged, string note,
+			double condHeuristic,
+			bool warnPoorGeometry)
+		{
+			var sb = new StringBuilder();
+			sb.AppendLine("MODEL=WGS84; A=6378137; F=1/298.257223563;");
+			sb.AppendLine("CONV_CRITERION=1e-6; MAX_ITERS=1000;");
+			sb.AppendLine($"USED={used}; DISCARDED={discarded};");
+
+			if (rejected.Count > 0)
+			{
+				sb.Append("REASONS=[");
+				sb.Append(string.Join(";", rejected.Select(r => r.Code.ToString())));
+				sb.AppendLine("];");
+			}
+			else
+			{
+				sb.AppendLine("REASONS=[];");
+			}
+
+			sb.AppendLine($"SOLVER: iters={iters}; converged={(converged ? "true" : "false")};");
+
+			if (!string.IsNullOrWhiteSpace(note))
+				sb.AppendLine($"note={note};");
+
+			sb.AppendLine($"JTJ_COND_HEURISTIC={condHeuristic:E3};");
+			if (warnPoorGeometry)
+				sb.AppendLine("WARNING=POOR_GEOMETRY;");
+
+			return sb.ToString();
 		}
 	}
 
@@ -628,7 +671,7 @@ namespace GeoAltReceiver
 
 			if (pathArg is null)
 			{
-				Console.WriteLine("GeoAlt-Receiver (ЛР-1) — імпорт/валідація CSV + обчислення φ,λ,h + ε… (%) + експорт");
+				Console.WriteLine("GeoAlt-Receiver (ЛР-1) — імпорт/валідація CSV + обчислення φ,λ,h + ε… (%) + експорт + протокол");
 				Console.WriteLine("Використання: GeoAltReceiver <path-to-csv> [--verbose]");
 				Console.WriteLine("Приклад CSV (8 колонок):");
 				Console.WriteLine("ri,Δri,φi,Δφi,λi,Δλi,hi,Δhi");
@@ -647,12 +690,14 @@ namespace GeoAltReceiver
 
 				if (used < 4)
 				{
-					Console.WriteLine("ERR_NOT_ENOUGH_DATA: Недостатньо даних для визначення φ, λ, h (N<4).");
+					Console.WriteLine("ERR_NOT_ENOUGH_DATA: " + Errors.ERR_NOT_ENOUGH_DATA);
 					Logger.Error("Not enough valid observations (N<4).");
+					// Протокол із порожніми розрахунками, але з REASONS
+					ExportProtocolOnly(pathArg, used, discarded, rejected, 0, false, "NOT_ENOUGH_DATA", 0.0, false);
 					return 2;
 				}
 
-				// Перетворюємо супутники в ECEF та формуємо вектори відстаней
+				// Перетворення супутників у ECEF та вектори відстаней
 				var satsEcef = new List<EcefPoint>(used);
 				var ranges = new List<double>(used);
 				foreach (var o in valid)
@@ -663,29 +708,27 @@ namespace GeoAltReceiver
 					ranges.Add(o.r);
 				}
 
-				// Розв’язуємо положення приймача (ECEF)
+				// Розв’язання
 				var opt = new SolverGN.Options { MaxIters = 1000, Tol = 1e-6, Damp = 1e-3 };
-				var (rEcef, iters, converged, JTJ_last, JTv_last, Jrows, gModel) = SolverGN.Solve(satsEcef, ranges, opt, verbose);
+				var (rEcef, iters, converged, JTJ_last, Jrows, gModel) = SolverGN.Solve(satsEcef, ranges, opt, verbose);
 
-				// Перетворюємо в геодезичні координати приймача
 				var outGeo = GeoTransform.EcefToGeo(rEcef);
 
-				// Ефективні σ_i для кожного вимірювання (з урахуванням Δri, Δφi, Δλi, Δhi)
+				// Ефективні σ_i
 				var sigmaEff = new List<double>(used);
 				for (int i = 0; i < used; i++)
 					sigmaEff.Add(Uncertainty.EffectiveSigmaMeters(valid[i], rEcef, verbose));
 
-				// Коваріація приймача в ECEF
-				if (!Uncertainty.CovarianceReceiverECEF(Jrows, sigmaEff, out var Cov_r))
-				{
-					Console.WriteLine("WARNING: Неможливо обчислити коваріацію приймача (погана обумовленість).");
-				}
+				// Коваріація приймача та «геометрія»
+				double[,] Cov_r;
+				double condHeuristic;
+				bool okCov = Uncertainty.CovarianceReceiverECEF(Jrows, sigmaEff, out Cov_r, out condHeuristic);
 
-				// Перенесення коваріації у простір (φ,λ,h)
+				// Евристика POOR_GEOMETRY: велике condHeuristic
+				bool warnPoorGeometry = condHeuristic > 1e12;
+
 				var T = Uncertainty.JacobianGeoWrtECEF(rEcef);
 				var Cov_out = Uncertainty.CovarianceOut(Cov_r, T);
-
-				// Відносні похибки у %
 				var (epsPhiPct, epsLamPct, epsHPct) = Uncertainty.RelativeErrorsPct(outGeo, Cov_out);
 
 				var dt = (int)(DateTime.UtcNow - t0).TotalMilliseconds;
@@ -701,11 +744,29 @@ namespace GeoAltReceiver
 				Console.WriteLine($"used={used}; discarded={discarded}; calc_time_ms={dt}");
 				Console.WriteLine($"iters={iters}; converged={(converged ? "true" : "false")}");
 
+				string note = "";
 				if (!converged)
-					Console.WriteLine("WARNING: Досягнуто ліміт ітерацій без збіжності (результат попередній).");
+				{
+					Console.WriteLine("WARNING: " + Errors.ERR_NO_CONVERGENCE);
+					note = "ITERATION_LIMIT";
+				}
+				if (warnPoorGeometry)
+				{
+					Console.WriteLine("WARNING: POOR_GEOMETRY (можлива велика невизначеність).");
+					if (string.IsNullOrEmpty(note)) note = "POOR_GEOMETRY";
+					else note += "|POOR_GEOMETRY";
+				}
 
-				// Експорт CSV/JSON за SR-F12
+				// Експорт результатів і протоколу
 				ExportResults(pathArg, outGeo, epsPhiPct, epsLamPct, epsHPct, used, discarded, dt);
+				ExportProtocol(pathArg, used, discarded, rejected, iters, converged, note, condHeuristic, warnPoorGeometry);
+
+				if (verbose)
+				{
+					var proto = ProtocolBuilder.Build(used, discarded, rejected, iters, converged, note, condHeuristic, warnPoorGeometry);
+					Console.WriteLine("=== Протокол (скорочено) ===");
+					Console.Write(proto);
+				}
 
 				Logger.Info($"Finish: used={used}; discarded={discarded}; iters={iters}; conv={converged}; ms={dt}");
 				return 0;
@@ -765,6 +826,30 @@ namespace GeoAltReceiver
 
 			Console.WriteLine($"[i] Експортовано: {csvPath}");
 			Console.WriteLine($"[i] Експортовано: {jsonPath}");
+		}
+
+		private static void ExportProtocol(
+			string inputPath,
+			int used, int discarded, List<Rejection> rejected,
+			int iters, bool converged, string note,
+			double condHeuristic, bool warnPoorGeometry)
+		{
+			string dir = Path.GetDirectoryName(Path.GetFullPath(inputPath)) ?? ".";
+			string baseName = Path.GetFileNameWithoutExtension(inputPath);
+			string protoPath = Path.Combine(dir, baseName + "_protocol.txt");
+
+			var proto = ProtocolBuilder.Build(used, discarded, rejected, iters, converged, note, condHeuristic, warnPoorGeometry);
+			File.WriteAllText(protoPath, proto, new UTF8Encoding(false));
+			Console.WriteLine($"[i] Експортовано: {protoPath}");
+		}
+
+		private static void ExportProtocolOnly(
+			string inputPath,
+			int used, int discarded, List<Rejection> rejected,
+			int iters, bool converged, string note,
+			double condHeuristic, bool warnPoorGeometry)
+		{
+			ExportProtocol(inputPath, used, discarded, rejected, iters, converged, note, condHeuristic, warnPoorGeometry);
 		}
 	}
 }
