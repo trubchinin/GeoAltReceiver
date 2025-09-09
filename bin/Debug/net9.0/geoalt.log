@@ -18,3 +18,7 @@
 2025-09-09T11:26:57.2329960Z [INFO] Finish: used=7; discarded=0; iters=45; conv=True; ms=11
 2025-09-09T11:27:05.6653930Z [INFO] Start run: data/CSV_PoorGeom_4rows.csv
 2025-09-09T11:27:05.6853990Z [INFO] Finish: used=4; discarded=0; iters=1000; conv=False; ms=21
+2025-09-09T11:43:55.6826140Z [INFO] Start run: data/CSV_Valid_7rows.csv
+2025-09-09T11:43:55.7213650Z [INFO] Finish: used=7; discarded=0; iters=45; conv=True; ms=21
+2025-09-09T11:44:08.2144170Z [INFO] Start run: data/CSV_Valid_4rows.csv
+2025-09-09T11:44:08.2511010Z [INFO] Finish: used=4; discarded=0; iters=64; conv=True; ms=17

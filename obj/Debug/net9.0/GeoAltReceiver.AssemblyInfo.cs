@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GeoAltReceiver")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dde3c7fe0faecf8d87ef7c5495c296fd9f6e08c9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a6db096cb17816d02a2aa9b18b21f4c9cc061f8a")]
 [assembly: System.Reflection.AssemblyProductAttribute("GeoAltReceiver")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GeoAltReceiver")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
