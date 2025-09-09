@@ -12,3 +12,9 @@
 2025-09-09T11:11:19.7584840Z [INFO] Finish import: used=0; discarded=5; ms=7
 2025-09-09T11:11:23.2137040Z [INFO] Start import: data/CSV_ZeroSigmas.csv
 2025-09-09T11:11:23.2286420Z [INFO] Finish import: used=4; discarded=0; ms=16
+2025-09-09T11:26:45.2212050Z [INFO] Start run: data/CSV_Valid_4rows.csv
+2025-09-09T11:26:45.2387210Z [INFO] Finish: used=4; discarded=0; iters=64; conv=True; ms=11
+2025-09-09T11:26:57.2163560Z [INFO] Start run: data/CSV_Valid_7rows.csv
+2025-09-09T11:26:57.2329960Z [INFO] Finish: used=7; discarded=0; iters=45; conv=True; ms=11
+2025-09-09T11:27:05.6653930Z [INFO] Start run: data/CSV_PoorGeom_4rows.csv
+2025-09-09T11:27:05.6853990Z [INFO] Finish: used=4; discarded=0; iters=1000; conv=False; ms=21

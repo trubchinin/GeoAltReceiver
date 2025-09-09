@@ -12,3 +12,4 @@
 /Users/markzoopark/Library/CloudStorage/GoogleDrive-nitenwarrior@gmail.com/My Drive/НИКИТА/ТЕСТУВАННЯ ТА ВЕРИФІКАЦІЯ ПЗ/GeoAltReceiver/obj/Debug/net9.0/GeoAltReceiver.pdb
 /Users/markzoopark/Library/CloudStorage/GoogleDrive-nitenwarrior@gmail.com/My Drive/НИКИТА/ТЕСТУВАННЯ ТА ВЕРИФІКАЦІЯ ПЗ/GeoAltReceiver/obj/Debug/net9.0/GeoAltReceiver.genruntimeconfig.cache
 /Users/markzoopark/Library/CloudStorage/GoogleDrive-nitenwarrior@gmail.com/My Drive/НИКИТА/ТЕСТУВАННЯ ТА ВЕРИФІКАЦІЯ ПЗ/GeoAltReceiver/obj/Debug/net9.0/ref/GeoAltReceiver.dll
+/Users/markzoopark/Library/CloudStorage/GoogleDrive-nitenwarrior@gmail.com/My Drive/НИКИТА/ТЕСТУВАННЯ ТА ВЕРИФІКАЦІЯ ПЗ/GeoAltReceiver/obj/Debug/net9.0/GeoAltReceiver.sourcelink.json
