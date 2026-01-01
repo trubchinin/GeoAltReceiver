@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoAlt.Core", "GeoAlt.Core\GeoAlt.Core.csproj", "{005D1230-0162-41BD-843F-FC4F53B89278}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoAlt.App", "GeoAlt.App\GeoAlt.App.csproj", "{24C757DC-BC91-4352-8B7B-7728B51CEE06}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoAlt.Tests", "GeoAlt.Tests\GeoAlt.Tests.csproj", "{A4E963C9-69A9-4C04-93BA-36D442C3A176}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoAlt.IntegrationTests", "GeoAlt.IntegrationTests\GeoAlt.IntegrationTests.csproj", "{E1A12C9C-2E64-44C4-8767-0EED5804DDF0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{005D1230-0162-41BD-843F-FC4F53B89278}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{005D1230-0162-41BD-843F-FC4F53B89278}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{005D1230-0162-41BD-843F-FC4F53B89278}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{005D1230-0162-41BD-843F-FC4F53B89278}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24C757DC-BC91-4352-8B7B-7728B51CEE06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24C757DC-BC91-4352-8B7B-7728B51CEE06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24C757DC-BC91-4352-8B7B-7728B51CEE06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24C757DC-BC91-4352-8B7B-7728B51CEE06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4E963C9-69A9-4C04-93BA-36D442C3A176}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4E963C9-69A9-4C04-93BA-36D442C3A176}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4E963C9-69A9-4C04-93BA-36D442C3A176}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4E963C9-69A9-4C04-93BA-36D442C3A176}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1A12C9C-2E64-44C4-8767-0EED5804DDF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1A12C9C-2E64-44C4-8767-0EED5804DDF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1A12C9C-2E64-44C4-8767-0EED5804DDF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1A12C9C-2E64-44C4-8767-0EED5804DDF0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

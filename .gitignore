@@ -1,0 +1,18 @@
+[Bb]in/
+[Oo]bj/
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.log
+.DS_Store
+# Visual Studio Code
+.history/
+.ionide/
+# Artifacts
+*_result.csv
+*_result.json
+*_protocol.txt
+geoalt.log*
